@@ -22,7 +22,7 @@ handlers:
 
 loggers:
   development:
-    level: DEBUG
+    level: ERROR
     handlers: [ console ]
     propagate: no
 
