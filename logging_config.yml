@@ -1,24 +1,41 @@
 version: 1
+disable_existing_loggers: False
+
 formatters:
   simple:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
 handlers:
-  file_handler:
-    class: logging.FileHandler
+  console:
+    class: logging.StreamHandler
     level: DEBUG
     formatter: simple
-    filename: mylog.log
+    stream: ext://sys.stdout
 
-  console_handler:
-    class: logging.StreamHandler
+  file:
+    class: logging.FileHandler
     level: INFO
     formatter: simple
+    filename: myapp.log
+    mode: a
 
 loggers:
-  my_logger:
+  development:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+
+  staging:
     level: INFO
-    handlers: [file_handler, console_handler]
+    handlers: [ console, file ]
+    propagate: no
+
+  production:
+    level: WARNING
+    handlers: [ file ]
+    propagate: no
 
 root:
   level: DEBUG
-  handlers: [file_handler]
+  handlers: [ console ]
