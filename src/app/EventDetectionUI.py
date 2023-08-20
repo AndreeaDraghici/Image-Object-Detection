@@ -13,109 +13,99 @@ from src.db.DatabaseManager import DatabaseManager
 
 class EventDetectionUI :
     def __init__(self, root) :
+        try :
+            load_logging_config()
+            self.logger = logging.getLogger('EventDetectionUI')
 
-        load_logging_config()
-        self.logger = logging.getLogger('EventDetectionUI')
+            self.root = root
+            self.root.title("Object Detection Application")
+            self.root.resizable(False, False)
 
-        # Inițializarea ferestrei principale
-        self.root = root
-        self.root.title("Object Detection Application")
+            self.backend = EventDetection()
+            self.db_manager = DatabaseManager()
 
-        # Dezactivează redimensionarea ferestrei
-        self.root.resizable(False, False)
+            self.image_path = ""
+            self.image = None
 
-        self.backend = EventDetection()
-        self.db_manager = DatabaseManager()
+            self.canvas = tk.Canvas(root, width=416, height=416)
+            self.canvas.pack()
 
-        # Inițializarea calei imaginii și a imaginii încărcate
-        self.image_path = ""
-        self.image = None
+            self.select_button = tk.Button(root, text="Select Image", command=self.select_image)
+            self.select_button.pack()
 
-        # Inițializarea canvasului pentru afișarea imaginii
-        self.canvas = tk.Canvas(root, width=416, height=416)
-        self.canvas.pack()
+            self.detect_button = tk.Button(root, text="Detect Objects", command=self.detect_objects)
+            self.detect_button.pack()
 
-        # Inițializarea butonului pentru selectarea imaginii
-        self.select_button = tk.Button(root, text="Select Image", command=self.select_image)
-        self.select_button.pack()
+            self.label_text = tk.StringVar()
+            self.label = tk.Label(root, textvariable=self.label_text)
+            self.label.pack()
+        except Exception as e :
+            self.logger.error("An error occurred during UI initialization: %s", str(e))
 
-        # Inițializarea butonului pentru detectarea obiectelor
-        self.detect_button = tk.Button(root, text="Detect Objects", command=self.detect_objects)
-        self.detect_button.pack()
-
-        # Inițializarea etichetei pentru afișarea tipurilor de obiecte detectate
-        self.label_text = tk.StringVar()
-        self.label = tk.Label(root, textvariable=self.label_text)
-        self.label.pack()
-
-    # Metoda pentru selectarea imaginii din sistemul de fișiere
     def select_image(self) :
-        self.image_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png")])
+        try :
+            self.image_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg;*.png")])
 
-        if self.image_path :
-            self.logger.info("Selected image path:" + self.image_path)  # Afișează calea imaginii
-            self.image = cv2.imread(self.image_path)
+            if self.image_path :
+                self.logger.info("Selected image path: " + self.image_path)
+                self.image = cv2.imread(self.image_path)
 
-            if self.image is not None :
-                self.logger.info("Image loaded successfully.")
-                self.display_image()
-            else :
-                self.logger.info("Failed to load image.")
+                if self.image is not None :
+                    self.logger.info("Image loaded successfully.")
+                    self.display_image()
+                else :
+                    RuntimeError("Failed to load image.")
+                    return
+        except Exception as e :
+            self.logger.error("An error occurred during image selection: %s", str(e))
 
     def detect_objects(self) :
-        if self.image is not None and self.image_path :
-            if self.image_path :
-                detected_objects = self.backend.detect_objects(self.image_path)  # Trimiteți calea imaginii
+        try :
+            if self.image is not None and self.image_path :
+                if self.image_path :
+                    detected_objects = self.backend.detect_objects(self.image_path)
+                    self.logger.info("Image path: " + self.image_path)
+                    self.logger.info("Detected objects: " + str(detected_objects))
 
-                self.logger.info("Image path: " + self.image_path)
-                self.logger.info("Detected objects: " + str(detected_objects))
+                    self.label_text.set("Detected Objects: Detecting...")
 
-                self.label_text.set("Detected Objects: Detecting...")  # Setează un text temporar
+                    unique_detected_objects = []
+                    for obj_label, _ in detected_objects :
+                        unique_detected_objects.append(obj_label)
 
-                # Extract only the object labels from the detection results
-                unique_detected_objects = []
-                for obj_label, _ in detected_objects :
-                    unique_detected_objects.append(obj_label)
-
-                # Stocați obiectele detectate în baza de date
-                self.db_manager.insert_detected_objects(detected_objects)
-                self.display_image()
-
-                # Actualizează etichetele și lista de obiecte detectate
-                self.update_detected_objects(unique_detected_objects)
-
-                # Actualizează etichetele și lista de obiecte după un anumit interval de timp
-                self.root.after(5, self.update_detected_objects, unique_detected_objects)
+                    self.db_manager.insert_detected_objects(detected_objects)
+                    self.display_image()
+                    self.update_detected_objects(unique_detected_objects)
+                    self.root.after(5, self.update_detected_objects, unique_detected_objects)
+        except Exception as e :
+            self.logger.error("An error occurred during object detection: %s", str(e))
 
     def display_image(self) :
-        img = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (416, 416))
+        try :
+            img = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (416, 416))
+            detected_objects = self.backend.detect_objects(self.image_path)
 
-        # Detectați obiectele pe imaginea curentă
-        detected_objects = self.backend.detect_objects(self.image_path)
+            for obj_label, coords in detected_objects :
+                x, y, w, h = coords
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                label_position = (x, y + h + 20)
+                cv2.putText(img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
-        # Afișarea obiectelor detectate cu etichete
-        for obj_label, coords in detected_objects :
-            x, y, w, h = coords
+            img_pil = Image.fromarray(np.uint8(img))
+            img_tk = ImageTk.PhotoImage(image=img_pil)
+            self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+            self.canvas.image = img_tk
 
-            # Desenează un chenar în jurul obiectului și afișează eticheta
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            # Ajustează poziția etichetei pe baza marginii de jos a chenarului
-            label_position = (x, y + h + 20)
-
-            cv2.putText(img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-
-        img_pil = Image.fromarray(np.uint8(img))
-
-        img_tk = ImageTk.PhotoImage(image=img_pil)
-        self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
-        self.canvas.image = img_tk
-
-        if self.image is None :
-            self.logger.info("Image not loaded!")
-            return
+            if self.image is None :
+                RuntimeError("Image not loaded!")
+                return
+        except Exception as e :
+            self.logger.error("An error occurred during image display: %s", str(e))
 
     def update_detected_objects(self, detected_objects) :
-        self.label_text.set("Detected Objects: " + ", ".join(detected_objects))
-        self.root.update()  # Actualizați interfața grafică pentru a reflecta noile etichete
+        try :
+            self.label_text.set("Detected Objects: " + ", ".join(detected_objects))
+            self.root.update()
+        except Exception as e :
+            self.logger.error("An error occurred during updating detected objects: %s", str(e))
