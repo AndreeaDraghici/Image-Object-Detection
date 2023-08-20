@@ -80,6 +80,38 @@ class EventDetectionUI :
         except Exception as e :
             self.logger.error("An error occurred during object detection: %s", str(e))
 
+    ''' 
+    def display_selected_object(self, obj_label) :
+        if self.image is not None and self.image_path :
+            detected_objects = self.backend.detect_objects(self.image_path)
+
+            for obj_label_detected, coords in detected_objects :
+                if obj_label_detected == obj_label :
+                    x, y, w, h = coords
+                    selected_img = self.image.copy()
+
+                    # Redimensionați imaginea pentru afișarea etichetei
+                    selected_img = cv2.resize(selected_img, (416, 416))
+
+                    # Ajustați coordonatele obiectului pentru imaginea redimensionată
+                    x = int(x * 416 / self.image.shape[1])
+                    y = int(y * 416 / self.image.shape[0])
+                    w = int(w * 416 / self.image.shape[1])
+                    h = int(h * 416 / self.image.shape[0])
+
+                    # Desenează un chenar în jurul obiectului și afișează eticheta
+                    cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    label_position = (x, y + h + 20)  # Ajustați poziția etichetei
+                    cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX,0.7, (0, 255, 0), 2)
+
+                    img_pil = Image.fromarray(np.uint8(selected_img))
+                    img_tk = ImageTk.PhotoImage(image=img_pil)
+
+                    self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+                    self.canvas.image = img_tk
+                    break
+    '''
+
     def display_image(self) :
         try :
             img = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
@@ -87,19 +119,28 @@ class EventDetectionUI :
             detected_objects = self.backend.detect_objects(self.image_path)
 
             for obj_label, coords in detected_objects :
+
                 x, y, w, h = coords
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+                # Ajustați coordonatele obiectului pentru imaginea redimensionată
+                x = int(x * 416 / self.image.shape[1])
+                y = int(y * 416 / self.image.shape[0])
+                w = int(w * 416 / self.image.shape[1])
+                h = int(h * 416 / self.image.shape[0])
+
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 label_position = (x, y + h + 20)
                 cv2.putText(img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
-            img_pil = Image.fromarray(np.uint8(img))
-            img_tk = ImageTk.PhotoImage(image=img_pil)
-            self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
-            self.canvas.image = img_tk
+                img_pil = Image.fromarray(np.uint8(img))
+                img_tk = ImageTk.PhotoImage(image=img_pil)
+                self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+                self.canvas.image = img_tk
 
-            if self.image is None :
-                RuntimeError("Image not loaded!")
-                return
+                if self.image is None :
+                    RuntimeError("Image not loaded!")
+                    return
+
         except Exception as e :
             self.logger.error("An error occurred during image display: %s", str(e))
 
