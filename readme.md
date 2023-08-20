@@ -63,7 +63,7 @@ of the app's main features and components:
 
 1. **Graphical Interface (GUI):** The application has an intuitive graphical interface made using the tkinter library in
    Python.
-The GUI includes several key components:
+   The GUI includes several key components:
 
     - A canvas (drawing area) where the selected image and detection results are displayed.
 
@@ -114,3 +114,33 @@ The GUI includes several key components:
 
     - The user can click on the labels to display the image with the selected object highlighted.
 
+--------------------
+
+## Resources
+
+1. Object Detection Wiki: https://en.wikipedia.org/wiki/Object_detection
+
+
+2. YOLO Object Detection with OpenCV and
+   Python: https://towardsdatascience.com/yolo-object-detection-with-opencv-and-python-21e50ac599e9
+
+
+3. Object Recognition using Python: https://www.javatpoint.com/object-recognition-using-python
+
+
+4. Detect an object with OpenCV-Python: https://www.geeksforgeeks.org/detect-an-object-with-opencv-python/
+
+
+5. Object Detection with Python, Deep Learning, and
+   OpenCV: https://dontrepeatyourself.org/post/object-detection-with-python-deep-learning-and-opencv/
+
+
+6. Object Detection with Yolov3: https://github.com/patrick013/Object-Detection---Yolov3
+
+
+7. Object detection and tracking in Python: https://www.r-bloggers.com/2021/09/object-detection-and-tracking-in-python/
+
+
+8. Object Detection from Images with YOLO using Python:https://wellsr.com/python/object-detection-from-images-with-yolo/
+
+9. More examples: https://github.com/topics/object-detection
