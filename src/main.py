@@ -7,7 +7,7 @@ from src.app.EventDetectionUI import EventDetectionUI
 
 def main() :
     load_logging_config()
-    logger = logging.getLogger('Main')
+    logger = logging.getLogger('staging')
 
     try :
         root = tk.Tk()

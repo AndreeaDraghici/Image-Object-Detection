@@ -15,7 +15,7 @@ class EventDetectionUI :
     def __init__(self, root) :
         try :
             load_logging_config()
-            self.logger = logging.getLogger('EventDetectionUI')
+            self.logger = logging.getLogger('staging')
 
             self.root = root
             self.root.title("Object Detection Application")
@@ -96,34 +96,39 @@ class EventDetectionUI :
             self.logger.error("An error occurred during object detection: %s", str(e))
 
     def display_selected_object(self, obj_label) :
-        if self.image is not None and self.image_path :
-            detected_objects = self.backend.detect_objects(self.image_path)
+        try :
+            if self.image is not None and self.image_path :
+                detected_objects = self.backend.detect_objects(self.image_path)
 
-            for obj_label_detected, coords in detected_objects :
-                if obj_label_detected == obj_label :
-                    x, y, w, h = coords
-                    selected_img = self.image.copy()
+                for obj_label_detected, coords in detected_objects :
+                    if obj_label_detected == obj_label :
+                        x, y, w, h = coords
+                        selected_img = self.image.copy()
 
-                    # Redimensionați imaginea pentru afișarea etichetei
-                    selected_img = cv2.resize(selected_img, (416, 416))
+                        # Redimensionați imaginea pentru afișarea etichetei
+                        selected_img = cv2.resize(selected_img, (416, 416))
 
-                    # Ajustați coordonatele obiectului pentru imaginea redimensionată
-                    x = int(x * 416 / self.image.shape[1])
-                    y = int(y * 416 / self.image.shape[0])
-                    w = int(w * 416 / self.image.shape[1])
-                    h = int(h * 416 / self.image.shape[0])
+                        # Ajustați coordonatele obiectului pentru imaginea redimensionată
+                        x = int(x * 416 / self.image.shape[1])
+                        y = int(y * 416 / self.image.shape[0])
+                        w = int(w * 416 / self.image.shape[1])
+                        h = int(h * 416 / self.image.shape[0])
 
-                    # Desenează un chenar în jurul obiectului și afișează eticheta
-                    cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                    label_position = (x, y + h + 20)  # Ajustați poziția etichetei
-                    cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        # Desenează un chenar în jurul obiectului și afișează eticheta
+                        cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                        label_position = (x, y + h + 20)  # Ajustați poziția etichetei
+                        cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0),
+                                    2)
 
-                    img_pil = Image.fromarray(np.uint8(selected_img))
-                    img_tk = ImageTk.PhotoImage(image=img_pil)
+                        img_pil = Image.fromarray(np.uint8(selected_img))
+                        img_tk = ImageTk.PhotoImage(image=img_pil)
 
-                    self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
-                    self.canvas.image = img_tk
-                    break
+                        self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+                        self.canvas.image = img_tk
+                        break
+
+        except Exception as e :
+            self.logger.error("An error occurred in display_selected_object: %s", str(e))
 
     def display_image(self) :
         try :

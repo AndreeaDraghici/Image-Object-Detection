@@ -10,7 +10,7 @@ class EventDetection :
 
     def __init__(self) :
         load_logging_config()
-        self.logger = logging.getLogger('EventDetection')
+        self.logger = logging.getLogger('development')
 
         try :
             # Initialize the YOLO detector
