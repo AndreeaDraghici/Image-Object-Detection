@@ -1,9 +1,14 @@
+import logging
 import tkinter as tk
 
+from src.LoadLoggingConfig import load_logging_config
 from src.app.EventDetectionUI import EventDetectionUI
 
 
 def main() :
+    load_logging_config()
+    logger = logging.getLogger('Main')
+
     try :
         root = tk.Tk()
         EventDetectionUI(root)
@@ -11,7 +16,7 @@ def main() :
     except Exception as e :
         RuntimeError("An error occurred:", e)
     else :
-        print("Application run successfully.")
+        logger.info("Application run successfully.")
 
 
 if __name__ == "__main__" :
