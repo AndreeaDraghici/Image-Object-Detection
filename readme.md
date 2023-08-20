@@ -63,7 +63,6 @@ of the app's main features and components:
 
 1. **Graphical Interface (GUI):** The application has an intuitive graphical interface made using the tkinter library in
    Python.
-
 The GUI includes several key components:
 
     - A canvas (drawing area) where the selected image and detection results are displayed.
@@ -73,6 +72,7 @@ The GUI includes several key components:
     - A "Detect Objects" button to initiate the process of detecting objects in the image.
 
     - A text field for displaying detection results.
+
 
 2. **Object Detection:** The object detection process is done through the EventDetection class, which handles using a
    machine learning model (eg a model pre-trained on a dataset of objects). This model is used to identify and locate
@@ -98,6 +98,7 @@ The GUI includes several key components:
       labels.
 
     - The user can click on object labels to display the image with a specific object highlighted.
+
 
 5. **Image Resizing:** The uploaded image is resized to fit the display canvas. This ensures that the image and detected
    objects are displayed correctly in the GUI.
