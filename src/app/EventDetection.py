@@ -1,8 +1,18 @@
+import logging
+
 import cv2
 import numpy as np
 
+from src.LoadLoggingConfig import load_logging_config
+
+
 class EventDetection :
+
     def __init__(self) :
+
+        load_logging_config()
+        self.logger = logging.getLogger('EventDetection')
+
         # Inițializarea detectorului YOLO
         self.net = cv2.dnn.readNet('../model/yolov3.cfg', '../model/yolov3.weights')
         self.classes = []
@@ -43,33 +53,26 @@ class EventDetection :
 
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, score_threshold=0.5, nms_threshold=0.4)
 
-        for i in range(len(boxes)) :
-            if i in indexes :
-                x, y, w, h = boxes[i]
-                label = str(self.classes[class_ids[i]])
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.putText(image, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
         detected_objects = []
+
         for i in range(len(boxes)) :
             if i in indexes :
                 label = str(self.classes[class_ids[i]])
-                print("Detected label:", label)  # Adăugați această linie pentru a verifica labelul detectat
-                detected_objects.append(label)
+                detected_objects.append((label, boxes[i]))
 
         return detected_objects
 
     # Metoda pentru obținerea numelor stratelor de ieșire din rețea
     def get_output_layers(self) :
         layers_names = self.net.getLayerNames()
-        print("Layers names:", layers_names)  # Print the layers names for debugging
+        self.logger.debug("Layers names: " + str(layers_names))  # Convert the list to a string before concatenating
 
         unconnected_layers = self.net.getUnconnectedOutLayers()
-        print("Unconnected layers:", unconnected_layers)  # Print the unconnected layers for debugging
+        self.logger.debug("Unconnected layers: " + str(unconnected_layers))  # Convert the list to a string before concatenating
 
         output_layers = []
         for layer in unconnected_layers :
             output_layers.append(layers_names[layer - 1])
-        print("Output layers:", output_layers)  # Print the calculated output layers for debugging
+        self.logger.debug("Output layers: " + str(output_layers))  # Convert the list to a string before concatenating
 
         return output_layers

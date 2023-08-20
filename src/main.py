@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from src.app.GUI import EventDetectionUI
+from src.app.EventDetectionUI import EventDetectionUI
 
 
 def main() :
