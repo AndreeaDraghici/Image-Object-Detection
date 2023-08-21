@@ -10,7 +10,8 @@ experience for detecting and viewing objects in images.
 1. **Python version:** Used Python 3.10.
 
 You can check the version of Python using the command on the command line:
-> python --version ***or*** python3 --version
+
+```python --version or python3 --version```
 
 2. **Required Libraries:** The application uses the following libraries, so make sure you have them installed:
 
@@ -25,26 +26,30 @@ You can check the version of Python using the command on the command line:
 
 To install the libraries in Python, you can use the pip install <library_name> command like below.
 
-> pip install opencv-python
+```pip install opencv-python```
 
 Or for all required libraries you could use the next command in command prompt to install all necessary libraries:
-> pip install opencv-python numpy pillow
+
+```pip install opencv-python numpy pillow```
 
 3. **Running:** After you have installed the necessary libraries , you can run the application by running the main.py file.
 Use the command line to navigate to the directory where this file is located and then run it using the command:
 
 To navigate to the directory you can use the next command:
-> cd name_of_directory
+
+```cd name_of_directory```
 
 To run the application you can use the next command:
-> python main.py ***or*** python3 main.py
+
+```python main.py or python3 main.py```
 
 E.g:
 
-> cd MyProjectsDirectory
-> 
-> python main.py
+```
+cd MyProjectsDirectory
 
+python main.py
+```
 ------------------------
 
 ## About technical aspects
