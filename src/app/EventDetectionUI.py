@@ -117,6 +117,12 @@ class EventDetectionUI :
                 self.db_manager.insert_detected_objects(detected_objects)
                 self.display_image()
 
+                if not detected_objects :
+                    # No objects detected
+                    self.label_text.set("Detected Objects: No objects detected")
+                    raise RuntimeError("No objects detected")
+                    return
+
                 # Clear existing buttons
                 for button in self.detected_objects_buttons :
                     button.destroy()
@@ -146,6 +152,13 @@ class EventDetectionUI :
 
         """
         try :
+
+            # Check if the button for the selected object exists
+            if obj_label not in self.detected_objects_buttons_dict :
+                self.label_text.set("Selected object button does not exist.")
+                raise RuntimeError("Selected object button does not exist.")
+                return
+
             # Check if both the image and its path are available
             if self.image is not None and self.image_path :
                 button = self.detected_objects_buttons_dict.get(obj_label)
