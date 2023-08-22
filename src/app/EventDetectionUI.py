@@ -13,6 +13,7 @@ from src.db.DatabaseManager import DatabaseManager
 
 class EventDetectionUI :
     def __init__(self, root) :
+        self.detected_objects_buttons_dict = {}
         try :
             # Load logging configuration
             load_logging_config()
@@ -40,10 +41,6 @@ class EventDetectionUI :
             # Create a button to select an image and bind it to the select_image method
             self.select_button = tk.Button(root, text="Select Image", command=self.select_image)
             self.select_button.pack()
-
-            # Create a button to detect objects and bind it to the detect_objects method
-            self.detect_button = tk.Button(root, text="Detect Objects", command=self.detect_objects)
-            self.detect_button.pack()
 
             # Create a label to display information and bind it to a StringVar
             self.label_text = tk.StringVar()
@@ -79,6 +76,9 @@ class EventDetectionUI :
                     self.logger.info("Image loaded successfully.")
                     # Display the loaded image
                     self.display_image()
+
+                    self.detect_objects()
+                    self.select_button.pack_forget()
                 else :
                     # If image loading fails, raise a RuntimeError and log the error
                     raise RuntimeError("Failed to load image.")
@@ -128,6 +128,7 @@ class EventDetectionUI :
                                        command=lambda label=obj_label : self.display_selected_object(label))
                     button.pack()
                     self.detected_objects_buttons.append(button)
+                    self.detected_objects_buttons_dict[obj_label] = button
 
                 # Update the label to show the list of detected objects
                 self.label_text.set("Detected Objects: " + ", ".join(unique_detected_objects))
@@ -147,39 +148,43 @@ class EventDetectionUI :
         try :
             # Check if both the image and its path are available
             if self.image is not None and self.image_path :
-                # Detect objects in the selected image
-                detected_objects = self.backend.detect_objects(self.image_path)
+                button = self.detected_objects_buttons_dict.get(obj_label)
+                if button :
 
-                # Iterate through detected objects and their coordinates
-                for obj_label_detected, coords in detected_objects :
+                    # Detect objects in the selected image
+                    detected_objects = self.backend.detect_objects(self.image_path)
 
-                    # Check if the detected object matches the requested label
-                    if obj_label_detected == obj_label :
-                        x, y, w, h = coords
-                        selected_img = self.image.copy()
+                    selected_img = self.image.copy()
+                    # Resize the image for displaying the label
+                    selected_img = cv2.resize(selected_img, (416, 416))
 
-                        # Resize the image for displaying the label
-                        selected_img = cv2.resize(selected_img, (416, 416))
+                    # Iterate through detected objects and their coordinates
+                    for obj_label_detected, coords in detected_objects :
 
-                        # Adjust object coordinates for the resized image
-                        x = int(x * 416 / self.image.shape[1])
-                        y = int(y * 416 / self.image.shape[0])
-                        w = int(w * 416 / self.image.shape[1])
-                        h = int(h * 416 / self.image.shape[0])
+                        # Check if the detected object matches the requested label
+                        if obj_label_detected == obj_label :
+                            x, y, w, h = coords
 
-                        # Draw a bounding box around the object and display the label
-                        cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                        label_position = (x, y + h + 20)  # Adjust label position
-                        cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                            # Adjust object coordinates for the resized image
+                            x = int(x * 416 / self.image.shape[1])
+                            y = int(y * 416 / self.image.shape[0])
+                            w = int(w * 416 / self.image.shape[1])
+                            h = int(h * 416 / self.image.shape[0])
 
-                        # Convert the OpenCV image to PIL format
-                        img_pil = Image.fromarray(np.uint8(selected_img))
-                        img_tk = ImageTk.PhotoImage(image=img_pil)
+                            # Draw a bounding box around the object and display the label
+                            cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            label_position = (x, y + h + 20)  # Adjust label position
+                            cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                                        (0, 255, 0),
+                                        2)
 
-                        # Display the modified image on the canvas
-                        self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
-                        self.canvas.image = img_tk
-                        break
+                    # Convert the OpenCV image to PIL format
+                    img_pil = Image.fromarray(np.uint8(selected_img))
+                    img_tk = ImageTk.PhotoImage(image=img_pil)
+
+                    # Display the modified image on the canvas
+                    self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+                    self.canvas.image = img_tk
         except Exception as e :
             # Log an error if any exception occurs during displaying the selected object
             self.logger.error("An error occurred in display_selected_object: %s", str(e))
