@@ -13,12 +13,10 @@ def load_logging_config() :
 
     except FileNotFoundError as e :
         # Handle the case when the configuration file is not found
-        RuntimeError("Error: Logging configuration file not found:", e)
-
+        raise RuntimeError("Error: Logging configuration file not found:", e)
     except yaml.YAMLError as e :
         # Handle YAML parsing errors
-        RuntimeError("Error: Error parsing YAML configuration:", e)
-
+        raise RuntimeError("Error: Error parsing YAML configuration:", e)
     except Exception as e :
         # Handle other exceptions that might occur during configuration loading
-        RuntimeError("An error occurred during logging configuration:", e)
+        raise RuntimeError("An error occurred during logging configuration:", e)

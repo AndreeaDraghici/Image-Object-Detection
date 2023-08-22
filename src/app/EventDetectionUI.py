@@ -80,7 +80,7 @@ class EventDetectionUI :
                     # Display the loaded image
                     self.display_image()
                 else :
-                    # Raise an error if image loading failed
+                    # If image loading fails, raise a RuntimeError and log the error
                     raise RuntimeError("Failed to load image.")
                     return
         except Exception as e :
@@ -170,8 +170,7 @@ class EventDetectionUI :
                         # Draw a bounding box around the object and display the label
                         cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
                         label_position = (x, y + h + 20)  # Adjust label position
-                        cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0),
-                                    2)
+                        cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
                         # Convert the OpenCV image to PIL format
                         img_pil = Image.fromarray(np.uint8(selected_img))
@@ -233,7 +232,6 @@ class EventDetectionUI :
         try :
             # Update the label text with the list of detected objects
             self.label_text.set("Detected Objects: " + ", ".join(detected_objects))
-
             # Update the GUI to reflect the changes
             self.root.update()
         except Exception as e :
