@@ -53,6 +53,7 @@ class EventDetectionUI :
             # Log an error if any exception occurs during UI initialization
             self.logger.error("An error occurred during UI initialization: %s", str(e))
 
+
     def select_image(self) :
         """
             This method allows the user to select an image using a file dialog.
@@ -86,6 +87,7 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if any exception occurs during image selection
             self.logger.error("An error occurred during image selection: %s", str(e))
+
 
     def detect_objects(self) :
         """
@@ -142,6 +144,7 @@ class EventDetectionUI :
             # Log an error if any exception occurs during object detection
             self.logger.error("An error occurred during object detection: %s", str(e))
 
+
     def display_selected_object(self, obj_label) :
         """
             This method displays a selected object along with its label on the canvas.
@@ -152,7 +155,6 @@ class EventDetectionUI :
 
         """
         try :
-
             # Check if the button for the selected object exists
             if obj_label not in self.detected_objects_buttons_dict :
                 self.label_text.set("Selected object button does not exist.")
@@ -202,6 +204,7 @@ class EventDetectionUI :
             # Log an error if any exception occurs during displaying the selected object
             self.logger.error("An error occurred in display_selected_object: %s", str(e))
 
+
     def display_image(self) :
         try :
             # Convert and resize the image for display
@@ -239,6 +242,7 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if any exception occurs during image display
             self.logger.error("An error occurred during image display: %s", str(e))
+
 
     def update_detected_objects(self, detected_objects) :
         """
