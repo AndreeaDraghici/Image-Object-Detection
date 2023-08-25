@@ -110,8 +110,8 @@ class EventDetectionUI :
 
                 # Create a list to store unique detected object labels
                 unique_detected_objects = []
-                for obj_label, _ in detected_objects :
-                    unique_detected_objects.append(obj_label)
+                for obj_label, coords, confidence in detected_objects :
+                    unique_detected_objects.append((obj_label, confidence))
 
                 # Insert detected objects into the database
                 self.db_manager.insert_detected_objects(detected_objects)
@@ -129,8 +129,8 @@ class EventDetectionUI :
                 self.detected_objects_buttons.clear()
 
                 # Update the detected objects with buttons
-                for obj_label in unique_detected_objects :
-                    button = tk.Button(self.root, text=obj_label,
+                for obj_label, confidence in unique_detected_objects :
+                    button = tk.Button(self.root, text=f"{obj_label} ({confidence * 100:.2f}%)",
                                        command=lambda label=obj_label : self.display_selected_object(label))
                     button.pack()
                     self.detected_objects_buttons.append(button)
