@@ -53,7 +53,6 @@ class EventDetectionUI :
             # Log an error if any exception occurs during UI initialization
             self.logger.error("An error occurred during UI initialization: %s", str(e))
 
-
     def select_image(self) :
         """
             This method allows the user to select an image using a file dialog.
@@ -87,7 +86,6 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if any exception occurs during image selection
             self.logger.error("An error occurred during image selection: %s", str(e))
-
 
     def detect_objects(self) :
         """
@@ -143,7 +141,6 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if any exception occurs during object detection
             self.logger.error("An error occurred during object detection: %s", str(e))
-
 
     def display_selected_object(self, obj_label) :
         """
@@ -204,7 +201,6 @@ class EventDetectionUI :
             # Log an error if any exception occurs during displaying the selected object
             self.logger.error("An error occurred in display_selected_object: %s", str(e))
 
-
     def display_image(self) :
         try :
             # Convert and resize the image for display
@@ -213,7 +209,7 @@ class EventDetectionUI :
             detected_objects = self.backend.detect_objects(self.image_path)
 
             # Loop through detected objects and their coordinates
-            for obj_label, coords in detected_objects :
+            for obj_label, coords, confidence in detected_objects :  # Added 'confidence'
                 x, y, w, h = coords
 
                 # Adjust object coordinates for the resized image
@@ -222,27 +218,27 @@ class EventDetectionUI :
                 w = int(w * 416 / self.image.shape[1])
                 h = int(h * 416 / self.image.shape[0])
 
-                # Draw a bounding box and display the label on the image
+                # Draw a bounding box and display the label with confidence on the image
+                label_text = f"{obj_label} ({confidence * 100:.2f}%)"  # Adding confidence to the label
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 label_position = (x, y + h + 20)
-                cv2.putText(img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(img, label_text, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
-                # Convert the OpenCV image to PIL format
-                img_pil = Image.fromarray(np.uint8(img))
-                img_tk = ImageTk.PhotoImage(image=img_pil)
+            # Convert the OpenCV image to PIL format
+            img_pil = Image.fromarray(np.uint8(img))
+            img_tk = ImageTk.PhotoImage(image=img_pil)
 
-                # Display the modified image on the canvas
-                self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
-                self.canvas.image = img_tk
+            # Display the modified image on the canvas
+            self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
+            self.canvas.image = img_tk
 
-                # Check if the image is not loaded
-                if self.image is None :
-                    raise RuntimeError("Image not loaded!")
-                    return
+            # Check if the image is not loaded
+            if self.image is None :
+                raise RuntimeError("Image not loaded!")
+
         except Exception as e :
             # Log an error if any exception occurs during image display
             self.logger.error("An error occurred during image display: %s", str(e))
-
 
     def update_detected_objects(self, detected_objects) :
         """
