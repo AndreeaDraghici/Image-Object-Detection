@@ -23,7 +23,8 @@ class DatabaseManager :
                     x INTEGER,
                     y INTEGER,
                     w INTEGER,
-                    h INTEGER
+                    h INTEGER,
+                    confidence REAL
                 )
             ''')
             # Commit the changes to the database
@@ -40,12 +41,17 @@ class DatabaseManager :
         """
         try :
             # Iterate through detected objects and insert them into the database
-            for obj_label, coords in detected_objects :
+            for obj_label, coords, confidence in detected_objects :
                 x, y, w, h = coords
-                self.cursor.execute('INSERT INTO detected_objects (object_type, x, y, w, h) VALUES (?, ?, ?, ?, ?)',
-                                    (obj_label, x, y, w, h))
-            # Commit the changes to the database
+
+                # Insert the object information into the database
+                self.cursor.execute(
+                    "INSERT INTO detected_objects (object_type, x, y, w, h, confidence) VALUES (?, ?, ?, ?, ?, ?)",
+                    (obj_label, x, y, w, h, confidence))
+
+                # Commit changes and close the connection
             self.conn.commit()
+            self.close_connection()
         except Exception as e :
             # Log an error if any exception occurs during insertion
             self.logger.error("An error occurred during inserting detected objects:", str(e))
