@@ -107,11 +107,15 @@ class EventDetection :
             for i in range(len(boxes)) :
                 # Check if the current box survived NMS
                 if i in indexes :
+
                     # Get the label corresponding to the class ID from the classes list
                     label = str(self.classes[class_ids[i]])
 
+                    # Retrieves the confidence level from the confidences list
+                    confidence = confidences[i]
+
                     # Append the label and bounding box coordinates to the list of detected objects
-                    detected_objects.append((label, boxes[i]))
+                    detected_objects.append((label, boxes[i], confidence))
 
             # Return the list of detected objects after NMS
             return detected_objects
