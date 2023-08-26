@@ -52,6 +52,7 @@ class DatabaseManager :
 
                 # Commit changes and close the connection
             self.commit_changes()
+            self.close_connection()
 
         except Exception as e :
             # Log an error if any exception occurs during insertion
