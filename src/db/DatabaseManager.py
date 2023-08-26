@@ -28,7 +28,8 @@ class DatabaseManager :
                 )
             ''')
             # Commit the changes to the database
-            self.conn.commit()
+            self.commit_changes()
+            self.close_connection()
         except Exception as e :
             # Log an error if any exception occurs during database initialization
             self.logger.error("An error occurred during database initialization:", str(e))
@@ -50,7 +51,7 @@ class DatabaseManager :
                     (obj_label, x, y, w, h, confidence))
 
                 # Commit changes and close the connection
-            self.conn.commit()
+            self.commit_changes()
             self.close_connection()
         except Exception as e :
             # Log an error if any exception occurs during insertion
@@ -63,3 +64,11 @@ class DatabaseManager :
         except Exception as e :
             # Log an error if any exception occurs during connection closing
             self.logger.error("An error occurred during closing connection:", str(e))
+
+    def commit_changes(self) :
+        try :
+            # Commit the database changes
+            self.conn.commit()
+        except Exception as e :
+            # Log an error if any exception occurs during commit the changes
+            self.logger.error("An error occurred during commit the changes on database:", str(e))
