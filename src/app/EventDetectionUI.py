@@ -137,7 +137,10 @@ class EventDetectionUI :
                     self.detected_objects_buttons_dict[obj_label] = button
 
                 # Update the label to show the list of detected objects
-                self.label_text.set("Detected Objects: " + ", ".join(unique_detected_objects))
+                self.label_text.set(
+                    "Detected Objects: {0}".format(
+                        ", ".join([f"{obj} ({conf * 100:.2f}%)" for obj, conf in unique_detected_objects]))
+                )
         except Exception as e :
             # Log an error if any exception occurs during object detection
             self.logger.error("An error occurred during object detection: %s", str(e))
@@ -171,7 +174,7 @@ class EventDetectionUI :
                     selected_img = cv2.resize(selected_img, (416, 416))
 
                     # Iterate through detected objects and their coordinates
-                    for obj_label_detected, coords in detected_objects :
+                    for obj_label_detected, coords, confidence in detected_objects :
 
                         # Check if the detected object matches the requested label
                         if obj_label_detected == obj_label :
@@ -183,12 +186,12 @@ class EventDetectionUI :
                             w = int(w * 416 / self.image.shape[1])
                             h = int(h * 416 / self.image.shape[0])
 
-                            # Draw a bounding box around the object and display the label
+                            # Draw a bounding box around the object and display the label and confidence
                             cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
                             label_position = (x, y + h + 20)  # Adjust label position
-                            cv2.putText(selected_img, obj_label, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7,
-                                        (0, 255, 0),
-                                        2)
+                            label_text = f"{obj_label} ({confidence * 100:.2f}%)"
+                            cv2.putText(selected_img, label_text, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                                        (0, 255, 0), 2)
 
                     # Convert the OpenCV image to PIL format
                     img_pil = Image.fromarray(np.uint8(selected_img))
