@@ -78,7 +78,7 @@ class EventDetectionUI :
                     self.display_image()
 
                     self.detect_objects()
-                    self.select_button.pack_forget()
+                    # self.select_button.pack_forget()
                 else :
                     # If image loading fails, raise a RuntimeError and log the error
                     raise RuntimeError("Failed to load image.")
@@ -115,6 +115,7 @@ class EventDetectionUI :
 
                 # Insert detected objects into the database
                 self.db_manager.insert_detected_objects(detected_objects)
+                self.db_manager.close_connection()
                 self.display_image()
 
                 if not detected_objects :

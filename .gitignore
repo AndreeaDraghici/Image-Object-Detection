@@ -1,3 +1,4 @@
 /.idea/
-/model/
+/db/detected_objects.db
 /src/myapp.log
+/model/yolov3.weights
