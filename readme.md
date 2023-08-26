@@ -190,4 +190,8 @@ of the app's main features and components:
 
 8. Object Detection from Images with YOLO using Python:https://wellsr.com/python/object-detection-from-images-with-yolo/
 
+
 9. More examples: https://github.com/topics/object-detection
+
+
+10. OpenCV Documentation: https://docs.opencv.org/3.4/d0/d0f/tutorial_js_object_detection.html
