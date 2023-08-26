@@ -5,6 +5,7 @@ from tkinter import filedialog
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
+from matplotlib import pyplot as plt
 
 from src.LoadLoggingConfig import load_logging_config
 from src.app.EventDetection import EventDetection
@@ -137,6 +138,15 @@ class EventDetectionUI :
                     self.detected_objects_buttons.append(button)
                     self.detected_objects_buttons_dict[obj_label] = button
 
+                    confidence_button = tk.Button(
+                        self.root,
+                        text="Confidence",
+                        command=lambda label=obj_label : self.generate_confidence_statistics(
+                            [(item[0], item[2]) for idx, item in enumerate(detected_objects) if item[0] == obj_label]
+                        ),
+                    )
+                    confidence_button.pack()
+
                 # Update the label to show the list of detected objects
                 self.label_text.set(
                     "Detected Objects: {0}".format(
@@ -201,6 +211,14 @@ class EventDetectionUI :
                     # Display the modified image on the canvas
                     self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
                     self.canvas.image = img_tk
+
+                    selected_object_data = []
+                    for item in detected_objects :
+                        if item[0] == obj_label :
+                            selected_object_data.append(item)
+                    if selected_object_data :
+                        self.generate_confidence_statistics(selected_object_data)
+
         except Exception as e :
             # Log an error if any exception occurs during displaying the selected object
             self.logger.error("An error occurred in display_selected_object: %s", str(e))
@@ -259,3 +277,24 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if an exception occurs during updating detected objects
             self.logger.error("An error occurred during updating detected objects: %s", str(e))
+
+    def generate_confidence_statistics(self, detected_objects) :
+        try :
+            # Collect confidence values
+            confidences = []
+            for _, confidence in detected_objects :
+                confidences.append(confidence)
+            detection_order = list(range(1, len(confidences) + 1))
+
+            # Create a line plot for confidence evolution
+            plt.figure(figsize=(10, 6))
+            plt.plot(detection_order, confidences, marker='o')
+            plt.title('Confidence Evolution')
+            plt.xlabel('Detection Order')
+            plt.ylabel('Confidence')
+            plt.xticks(detection_order)  # Set x-axis ticks to match detection order
+            plt.grid(True)
+
+            plt.show()
+        except Exception as e :
+            self.logger.error("An error occurred during generating confidence statistics: %s", str(e))
