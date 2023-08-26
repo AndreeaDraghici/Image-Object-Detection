@@ -78,7 +78,7 @@ class EventDetectionUI :
                     self.display_image()
 
                     self.detect_objects()
-                    self.select_button.pack_forget()
+                    # self.select_button.pack_forget()
                 else :
                     # If image loading fails, raise a RuntimeError and log the error
                     raise RuntimeError("Failed to load image.")
