@@ -29,7 +29,7 @@ class DatabaseManager :
             ''')
             # Commit the changes to the database
             self.commit_changes()
-            self.close_connection()
+
         except Exception as e :
             # Log an error if any exception occurs during database initialization
             self.logger.error("An error occurred during database initialization:", str(e))
@@ -52,7 +52,7 @@ class DatabaseManager :
 
                 # Commit changes and close the connection
             self.commit_changes()
-            self.close_connection()
+
         except Exception as e :
             # Log an error if any exception occurs during insertion
             self.logger.error("An error occurred during inserting detected objects:", str(e))

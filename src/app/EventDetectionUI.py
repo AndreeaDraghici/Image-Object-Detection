@@ -115,6 +115,7 @@ class EventDetectionUI :
 
                 # Insert detected objects into the database
                 self.db_manager.insert_detected_objects(detected_objects)
+                self.db_manager.close_connection()
                 self.display_image()
 
                 if not detected_objects :
