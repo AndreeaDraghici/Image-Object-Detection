@@ -154,7 +154,6 @@ class EventDetectionUI :
 
             :param obj_label:
             :return:
-
         """
         try :
             # Check if the button for the selected object exists
@@ -181,12 +180,7 @@ class EventDetectionUI :
                         # Check if the detected object matches the requested label
                         if obj_label_detected == obj_label :
                             x, y, w, h = coords
-
-                            # Adjust object coordinates for the resized image
-                            x = int(x * 500 / self.image.shape[1])
-                            y = int(y * 500 / self.image.shape[0])
-                            w = int(w * 500 / self.image.shape[1])
-                            h = int(h * 500 / self.image.shape[0])
+                            h, w, x, y = self.adjust_object_coordinates(h, w, x, y)
 
                             # Draw a bounding box around the object and display the label and confidence
                             cv2.rectangle(selected_img, (x, y), (x + w, y + h), (255, 255, 0), 2)
@@ -226,11 +220,7 @@ class EventDetectionUI :
             for obj_label, coords, confidence in detected_objects :  # Added 'confidence'
                 x, y, w, h = coords
 
-                # Adjust object coordinates for the resized image
-                x = int(x * 500 / self.image.shape[1])
-                y = int(y * 500 / self.image.shape[0])
-                w = int(w * 500 / self.image.shape[1])
-                h = int(h * 500 / self.image.shape[0])
+                h, w, x, y = self.adjust_object_coordinates(h, w, x, y)
 
                 # Draw a bounding box and display the label with confidence on the image
                 label_text = f"{obj_label} ({confidence * 100:.2f}%)"  # Adding confidence to the label
@@ -269,6 +259,14 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if an exception occurs during updating detected objects
             self.logger.error("An error occurred during updating detected objects: %s", str(e))
+
+    def adjust_object_coordinates(self, h, w, x, y) :
+        # Adjust object coordinates for the resized image
+        x = int(x * 500 / self.image.shape[1])
+        y = int(y * 500 / self.image.shape[0])
+        w = int(w * 500 / self.image.shape[1])
+        h = int(h * 500 / self.image.shape[0])
+        return h, w, x, y
 
     def generate_histogram(self, detected_objects) :
         """
