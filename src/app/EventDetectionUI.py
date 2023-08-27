@@ -36,7 +36,7 @@ class EventDetectionUI :
             self.image = None
 
             # Create a canvas for displaying images
-            self.canvas = tk.Canvas(root, width=416, height=416)
+            self.canvas = tk.Canvas(root, width=500, height=500)
             self.canvas.pack()
 
             # Create a button to select an image and bind it to the select_image method
@@ -132,7 +132,7 @@ class EventDetectionUI :
 
                 # Update the detected objects with buttons
                 for obj_label, confidence in unique_detected_objects :
-                    button = tk.Button(self.root, text=f"{obj_label} ({confidence * 100:.2f}%)",
+                    button = tk.Button(self.root, text=f"Generate histogram for object: {obj_label} ({confidence * 100:.2f}%)",
                                        command=lambda label=obj_label : self.display_selected_object(label))
                     button.pack()
                     self.detected_objects_buttons.append(button)
@@ -173,7 +173,7 @@ class EventDetectionUI :
 
                     selected_img = self.image.copy()
                     # Resize the image for displaying the label
-                    selected_img = cv2.resize(selected_img, (416, 416))
+                    selected_img = cv2.resize(selected_img, (500, 500))
 
                     # Iterate through detected objects and their coordinates
                     for obj_label_detected, coords, confidence in detected_objects :
@@ -183,17 +183,17 @@ class EventDetectionUI :
                             x, y, w, h = coords
 
                             # Adjust object coordinates for the resized image
-                            x = int(x * 416 / self.image.shape[1])
-                            y = int(y * 416 / self.image.shape[0])
-                            w = int(w * 416 / self.image.shape[1])
-                            h = int(h * 416 / self.image.shape[0])
+                            x = int(x * 500 / self.image.shape[1])
+                            y = int(y * 500 / self.image.shape[0])
+                            w = int(w * 500 / self.image.shape[1])
+                            h = int(h * 500 / self.image.shape[0])
 
                             # Draw a bounding box around the object and display the label and confidence
-                            cv2.rectangle(selected_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                            cv2.rectangle(selected_img, (x, y), (x + w, y + h), (255, 255, 0), 2)
                             label_position = (x, y + h + 20)  # Adjust label position
                             label_text = f"{obj_label} ({confidence * 100:.2f}%)"
-                            cv2.putText(selected_img, label_text, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7,
-                                        (0, 255, 0), 2)
+                            cv2.putText(selected_img, label_text, label_position, cv2.FONT_HERSHEY_TRIPLEX, 0.5,
+                                        (0, 0, 0), 2)
 
                     # Convert the OpenCV image to PIL format
                     img_pil = Image.fromarray(np.uint8(selected_img))
@@ -204,6 +204,7 @@ class EventDetectionUI :
                     self.canvas.image = img_tk
 
                     selected_object_data = []
+
                     for item in detected_objects :
                         if item[0] == obj_label :
                             selected_object_data.append(item)
@@ -218,7 +219,7 @@ class EventDetectionUI :
         try :
             # Convert and resize the image for display
             img = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-            img = cv2.resize(img, (416, 416))
+            img = cv2.resize(img, (500, 500))
             detected_objects = self.backend.detect_objects(self.image_path)
 
             # Loop through detected objects and their coordinates
@@ -226,16 +227,16 @@ class EventDetectionUI :
                 x, y, w, h = coords
 
                 # Adjust object coordinates for the resized image
-                x = int(x * 416 / self.image.shape[1])
-                y = int(y * 416 / self.image.shape[0])
-                w = int(w * 416 / self.image.shape[1])
-                h = int(h * 416 / self.image.shape[0])
+                x = int(x * 500 / self.image.shape[1])
+                y = int(y * 500 / self.image.shape[0])
+                w = int(w * 500 / self.image.shape[1])
+                h = int(h * 500 / self.image.shape[0])
 
                 # Draw a bounding box and display the label with confidence on the image
                 label_text = f"{obj_label} ({confidence * 100:.2f}%)"  # Adding confidence to the label
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
                 label_position = (x, y + h + 20)
-                cv2.putText(img, label_text, label_position, cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                cv2.putText(img, label_text, label_position, cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 0), 2)
 
             # Convert the OpenCV image to PIL format
             img_pil = Image.fromarray(np.uint8(img))
@@ -270,10 +271,11 @@ class EventDetectionUI :
             self.logger.error("An error occurred during updating detected objects: %s", str(e))
 
     def generate_histogram(self, detected_objects) :
+        """
+            Plot a histogram for the combined color channels of the detected object.
+            Plot histograms for the color channels of the detected object.
+        """
         try :
-
-            # Plot a histogram for the combined color channels of the detected object
-            # Plot histograms for the color channels of the detected object
             selected_object_data = detected_objects[-1]  # Get data for the last detected object
             if selected_object_data :
                 selected_img = cv2.imread(self.image_path)
@@ -296,4 +298,5 @@ class EventDetectionUI :
                 plt.show()
 
         except Exception as e :
+            # Handle and log any errors that might occur during histogram generation
             self.logger.error("An error occurred during generating histogram: %s", str(e))
