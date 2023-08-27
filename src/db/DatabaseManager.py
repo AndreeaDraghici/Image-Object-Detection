@@ -73,3 +73,19 @@ class DatabaseManager :
         except Exception as e :
             # Log an error if any exception occurs during commit the changes
             self.logger.error("An error occurred during commit the changes on database:", str(e))
+
+    def get_detected_objects(self) :
+        """
+              Retrieve a list of detected object types from the database.
+              :return: List of detected object types
+        """
+        try :
+            # Execute a query to retrieve the object types of detected objects
+            self.cursor.execute("SELECT object_type FROM detected_objects")
+            detected_objects = self.cursor.fetchall()
+            # Return a list of detected object types
+            return [row[0] for row in detected_objects]
+        except Exception as e :
+            # Log an error if any exception occurs during retrieval
+            self.logger.error("An error occurred during retrieving detected objects:", str(e))
+            return []

@@ -5,6 +5,7 @@ from tkinter import filedialog
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
+from matplotlib import pyplot as plt
 
 from src.LoadLoggingConfig import load_logging_config
 from src.app.EventDetection import EventDetection
@@ -201,6 +202,14 @@ class EventDetectionUI :
                     # Display the modified image on the canvas
                     self.canvas.create_image(0, 0, anchor=tk.NW, image=img_tk)
                     self.canvas.image = img_tk
+
+                    selected_object_data = []
+                    for item in detected_objects :
+                        if item[0] == obj_label :
+                            selected_object_data.append(item)
+                    if selected_object_data :
+                        self.generate_histogram(selected_object_data)
+
         except Exception as e :
             # Log an error if any exception occurs during displaying the selected object
             self.logger.error("An error occurred in display_selected_object: %s", str(e))
@@ -259,3 +268,32 @@ class EventDetectionUI :
         except Exception as e :
             # Log an error if an exception occurs during updating detected objects
             self.logger.error("An error occurred during updating detected objects: %s", str(e))
+
+    def generate_histogram(self, detected_objects) :
+        try :
+
+            # Plot a histogram for the combined color channels of the detected object
+            # Plot histograms for the color channels of the detected object
+            selected_object_data = detected_objects[-1]  # Get data for the last detected object
+            if selected_object_data :
+                selected_img = cv2.imread(self.image_path)
+                x, y, w, h = selected_object_data[1]  # Get coordinates of the detected object
+
+                # Extract the region of interest (ROI) from the image
+                roi = selected_img[y :y + h, x :x + w]
+
+                # Calculate histograms for the color channels (red, green, blue)
+                colors = ('b', 'g', 'r')
+                plt.figure(figsize=(10, 6))
+                for i, color in enumerate(colors) :
+                    hist = cv2.calcHist([roi], [i], None, [256], [0, 256])
+                    plt.plot(hist, color=color, label=f'Channel {color.upper()}')
+                plt.title('Color Channels Histogram')
+                plt.xlabel('Pixel Value')
+                plt.ylabel('Frequency')
+                plt.legend()
+                plt.grid(True)
+                plt.show()
+
+        except Exception as e :
+            self.logger.error("An error occurred during generating histogram: %s", str(e))

@@ -23,6 +23,8 @@ You can check the version of Python using the command on the command line:
     - ***numpy:*** For efficient manipulation of image data.
 
     - ***PIL (Pillow):*** For converting images between different formats.
+   
+    - ***matplotlib:*** For creating plot statistics about image processing and image confidence.
 
 To install the libraries in Python, you can use the pip install <library_name> command like below.
 
@@ -30,7 +32,7 @@ To install the libraries in Python, you can use the pip install <library_name> c
 
 Or for all required libraries you could use the next command in command prompt to install all necessary libraries:
 
-```pip install opencv-python numpy pillow```
+```pip install opencv-python numpy pillow matplotlib```
 
 3. **Running:** After you have installed the necessary libraries , you can run the application by running the main.py file.
 Use the command line to navigate to the directory where this file is located and then run it using the command:
