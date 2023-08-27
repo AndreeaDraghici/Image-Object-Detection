@@ -138,15 +138,6 @@ class EventDetectionUI :
                     self.detected_objects_buttons.append(button)
                     self.detected_objects_buttons_dict[obj_label] = button
 
-                    confidence_button = tk.Button(
-                        self.root,
-                        text="Confidence",
-                        command=lambda label=obj_label : self.generate_confidence_statistics(
-                            [(item[0], item[2]) for idx, item in enumerate(detected_objects) if item[0] == obj_label]
-                        ),
-                    )
-                    confidence_button.pack()
-
                 # Update the label to show the list of detected objects
                 self.label_text.set(
                     "Detected Objects: {0}".format(
@@ -217,7 +208,7 @@ class EventDetectionUI :
                         if item[0] == obj_label :
                             selected_object_data.append(item)
                     if selected_object_data :
-                        self.generate_confidence_statistics(selected_object_data)
+                        self.generate_histogram(selected_object_data)
 
         except Exception as e :
             # Log an error if any exception occurs during displaying the selected object
@@ -278,23 +269,31 @@ class EventDetectionUI :
             # Log an error if an exception occurs during updating detected objects
             self.logger.error("An error occurred during updating detected objects: %s", str(e))
 
-    def generate_confidence_statistics(self, detected_objects) :
+    def generate_histogram(self, detected_objects) :
         try :
-            # Collect confidence values
-            confidences = []
-            for _, confidence in detected_objects :
-                confidences.append(confidence)
-            detection_order = list(range(1, len(confidences) + 1))
 
-            # Create a line plot for confidence evolution
-            plt.figure(figsize=(10, 6))
-            plt.plot(detection_order, confidences, marker='o')
-            plt.title('Confidence Evolution')
-            plt.xlabel('Detection Order')
-            plt.ylabel('Confidence')
-            plt.xticks(detection_order)  # Set x-axis ticks to match detection order
-            plt.grid(True)
+            # Plot a histogram for the combined color channels of the detected object
+            # Plot histograms for the color channels of the detected object
+            selected_object_data = detected_objects[-1]  # Get data for the last detected object
+            if selected_object_data :
+                selected_img = cv2.imread(self.image_path)
+                x, y, w, h = selected_object_data[1]  # Get coordinates of the detected object
 
-            plt.show()
+                # Extract the region of interest (ROI) from the image
+                roi = selected_img[y :y + h, x :x + w]
+
+                # Calculate histograms for the color channels (red, green, blue)
+                colors = ('b', 'g', 'r')
+                plt.figure(figsize=(10, 6))
+                for i, color in enumerate(colors) :
+                    hist = cv2.calcHist([roi], [i], None, [256], [0, 256])
+                    plt.plot(hist, color=color, label=f'Channel {color.upper()}')
+                plt.title('Color Channels Histogram')
+                plt.xlabel('Pixel Value')
+                plt.ylabel('Frequency')
+                plt.legend()
+                plt.grid(True)
+                plt.show()
+
         except Exception as e :
-            self.logger.error("An error occurred during generating confidence statistics: %s", str(e))
+            self.logger.error("An error occurred during generating histogram: %s", str(e))
