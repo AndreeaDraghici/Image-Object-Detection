@@ -23,10 +23,18 @@ You can check the version of Python using the command on the command line:
     - ***numpy:*** For efficient manipulation of image data.
 
     - ***PIL (Pillow):*** For converting images between different formats.
-   
+
     - ***matplotlib:*** For creating plot statistics about image processing and image confidence.
 
-To install the libraries in Python, you can use the pip install <library_name> command like below.
+### ***To install the necessary libraries you have two possibility:***
+
+1. To install the necessary dependencies in your environment you can use the ***requirements.txt*** file.
+
+Simply run the following command in the project directory to install the dependencies:
+
+```pip install -r requirements.txt```
+
+2. To install manual the libraries in Python, you can use the pip install <library_name> command like below.
 
 ```pip install opencv-python```
 
@@ -34,8 +42,9 @@ Or for all required libraries you could use the next command in command prompt t
 
 ```pip install opencv-python numpy pillow matplotlib```
 
-3. **Running:** After you have installed the necessary libraries , you can run the application by running the main.py file.
-Use the command line to navigate to the directory where this file is located and then run it using the command:
+3. **Running:** After you have installed the necessary libraries , you can run the application by running the main.py
+   file.
+   Use the command line to navigate to the directory where this file is located and then run it using the command:
 
 To navigate to the directory you can use the next command:
 
@@ -52,6 +61,7 @@ cd MyProjectsDirectory
 
 python main.py
 ```
+
 ------------------------
 
 ## About technical aspects
@@ -196,4 +206,5 @@ of the app's main features and components:
 9. More examples: https://github.com/topics/object-detection
 
 
-10. OpenCV Documentation: https://docs.opencv.org/3.4/d0/d0f/tutorial_js_object_detection.html
+10.
+11. OpenCV Documentation: https://docs.opencv.org/3.4/d0/d0f/tutorial_js_object_detection.html
